@@ -1,0 +1,89 @@
+import 'dart:io';
+import 'package:fastpass/models/allCarsmodel.dart';
+import 'package:fastpass/models/allTransactions.dart';
+
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+import '../network/remote/dio_Helper.dart';
+import '../pages/AddVehicle/addvehicle.dart';
+import '../pages/Contactus/contactScreen.dart';
+import '../pages/Home/homeScreen.dart';
+import '../pages/carsScreen/carsscreen.dart';
+import '../pages/fine/finesScreen.dart';
+import '../shared/constants/constants.dart';
+import 'layoutStates.dart';
+
+class LayoutCubit extends Cubit<LayoutStates> {
+  //initial Constructor.
+  LayoutCubit() : super(LayoutInitialState());
+
+  static LayoutCubit get(context) => BlocProvider.of(context);
+
+  int currentIndex = 0;
+
+  List<BottomNavigationBarItem> bottomItems = [
+    BottomNavigationBarItem(
+      icon: Icon(Icons.home),
+      label: 'Home',
+    ),
+    BottomNavigationBarItem(
+      icon: Icon(Icons.money),
+      label: 'Fines',
+    ),
+    BottomNavigationBarItem(
+      icon: Icon(Icons.car_crash_rounded),
+      label: 'cars',
+    ),
+  ];
+
+  List<Widget> screens = [
+    HomeScreen(),
+    FineScreen(),
+    CarsScreen(),
+  ];
+
+  void changeBottomNavBar(index) {
+    currentIndex = index;
+
+    emit(CartaBottomNavState());
+  }
+
+  void uservehicle({
+    required String vIdcontroller,
+    required String licenceIdcontroller,
+    required String vClasscontroller,
+    required String trafficunitController,
+    required String licenceCreatecontroller,
+    required String licenceExpirecontroller,
+    required String manufacController,
+    required String modelController,
+    required String manufacYearcontroller,
+    required String colorController,
+    required File image,
+  }) {
+    //emit(CartaLoginLoadingState());
+    DioHelper.postData(
+      url: 'http://192.168.1.9:4242/vehicles',
+      data: {
+        'vehicle_id': vIdcontroller,
+        'license_id': licenceIdcontroller,
+        'vehicle_class': vClasscontroller,
+        'traffic_unit': trafficunitController,
+        'license_create_date': licenceCreatecontroller,
+        'license_expired_date': licenceExpirecontroller,
+        'manufacturer': manufacController,
+        'model': modelController,
+        'manufacturering_year': manufacYearcontroller,
+        'color': colorController,
+        'image': image,
+      },
+    ).then((value) {
+//      emit(CartaLoginSuccessState(cartaloginmodel));
+    }).catchError((error) {
+      print(error.toString());
+      // emit(CartaLoginErrorState(error.toString()));
+      print(error.toString());
+    });
+  }
+}
